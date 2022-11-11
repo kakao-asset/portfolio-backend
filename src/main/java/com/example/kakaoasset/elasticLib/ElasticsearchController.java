@@ -38,7 +38,7 @@ public class ElasticsearchController {
 
         afterTime = System.currentTimeMillis();
         secDiffTime = (afterTime - beforeTime);
-        System.out.println(secDiffTime + "ms");
+        System.out.println(secDiffTime);
         return result.toString();
     }
 }

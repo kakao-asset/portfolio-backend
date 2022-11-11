@@ -73,7 +73,7 @@ public class elasticAPI {
 
         afterTime = System.currentTimeMillis();
         secDiffTime = (afterTime - beforeTime);
-        System.out.println("api "+json.getJSONObject("hits").getJSONArray("hits").length()+" stock data success : " + secDiffTime + "ms");
+        System.out.println("api "+json.getJSONObject("hits").getJSONArray("hits").length()+" stock data success : " + secDiffTime);
         return jsonarr.toString();
     }
 
