@@ -1,5 +1,6 @@
 package com.example.kakaoasset.elasticAPI;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpResponse;
@@ -10,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 public class elasticAPI {
 
     @RequestMapping("/api")
-    public String api(){
+    public JSONArray api(){
 
 
         RestTemplate restTemplate = new RestTemplate();
@@ -23,20 +24,33 @@ public class elasticAPI {
         final HttpHeaders headers = new HttpHeaders();
         final HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        String res = restTemplate.exchange("http://192.168.0.34:9200/kosdaq-data/_search?pretty", HttpMethod.GET, entity, String.class).getBody();
+        String res = restTemplate.exchange("http://192.168.0.34:9200/stock-data/_search?pretty", HttpMethod.GET, entity, String.class).getBody();
 
         JSONObject json = new JSONObject(res);
 
         System.out.println("-------------------------------api---------------------------");
 
+        System.out.println("json = " + json);
+
+        JSONArray jsonarr = new JSONArray();
+
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
             String name = temp.getString("name");
-            String code = temp.getString("code");
-            System.out.println(name + ", " + code);
+            String code = temp.getString("symbolCode");
+            int tradePrice = temp.getInt("tradePrice");
+            System.out.println(name + ", " + code + ", " + tradePrice);
+
+            JSONObject itme = new JSONObject();
+            itme.put("name", temp.getString("name"));
+            itme.put("symbolCode", temp.getString("symbolCode"));
+            itme.put("tradePrice", temp.getInt("tradePrice"));
+
+            jsonarr.put(itme);
+
         }
 
-        return " : Rest Test 완료!!!";
+        return jsonarr;
     }
 
 }

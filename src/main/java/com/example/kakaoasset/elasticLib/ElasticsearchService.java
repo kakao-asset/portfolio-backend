@@ -17,7 +17,7 @@ public class ElasticsearchService {
 
     private final RestHighLevelClient client;
 
-    private static final String INDEX = "kosdaq-data";
+    private static final String INDEX = "stock-data";
 
     public SearchResponse sampleQuery() throws IOException {
 

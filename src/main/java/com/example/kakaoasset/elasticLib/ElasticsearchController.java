@@ -24,12 +24,13 @@ public class ElasticsearchController {
             JSONObject json = new JSONObject(searchResponse);
 
             System.out.println("-------------------------------lib---------------------------");
-
+            System.out.println("json = " + json);
             for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
                 JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("sourceAsMap");
                 String name = temp.getString("name");
-                String code = temp.getString("code");
-                System.out.println(name + ", " + code);
+                String code = temp.getString("symbolCode");
+                int tradePrice = temp.getInt("tradePrice");
+                System.out.println(name + ", " + code + ", " + tradePrice);
             }
 
 
