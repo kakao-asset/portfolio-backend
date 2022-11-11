@@ -24,10 +24,10 @@ public class ElasticsearchService {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
 //                .query(QueryBuilders.matchAllQuery())
                 //  .aggregation() // 필요할 경우 사용
-                .size(0);
+                .size(10000);
 
-        SearchRequest searchRequest = new SearchRequest(INDEX);
-//                .source(searchSourceBuilder);
+        SearchRequest searchRequest = new SearchRequest(INDEX)
+                .source(searchSourceBuilder);
 
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 

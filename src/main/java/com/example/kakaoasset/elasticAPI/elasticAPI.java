@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 public class elasticAPI {
 
     @RequestMapping("/api")
-    public JSONArray api(){
+    public String api(){
 
 
         RestTemplate restTemplate = new RestTemplate();
@@ -24,7 +24,7 @@ public class elasticAPI {
         final HttpHeaders headers = new HttpHeaders();
         final HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        String res = restTemplate.exchange("http://192.168.0.34:9200/stock-data/_search?pretty", HttpMethod.GET, entity, String.class).getBody();
+        String res = restTemplate.exchange("http://192.168.0.34:9200/stock-data/_search?pretty&size=10000", HttpMethod.GET, entity, String.class).getBody();
 
         JSONObject json = new JSONObject(res);
 
@@ -50,7 +50,7 @@ public class elasticAPI {
 
         }
 
-        return jsonarr;
+        return jsonarr.toString();
     }
 
 }
