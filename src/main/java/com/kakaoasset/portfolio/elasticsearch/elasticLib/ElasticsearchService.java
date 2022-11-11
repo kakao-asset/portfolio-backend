@@ -1,4 +1,4 @@
-package com.example.kakaoasset.elasticLib;
+package com.kakaoasset.portfolio.elasticsearch.elasticLib;
 
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.ElasticsearchStatusException;

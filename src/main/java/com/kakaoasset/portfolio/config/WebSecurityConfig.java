@@ -46,9 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests() // 보호된 리소스 URI에 접근 가능한지 체크
-                .antMatchers("/api/oauth/**").permitAll() // 전체 접근 허용
-                .antMatchers("/api/bridge").permitAll() // 전체 접근 허용
-                .antMatchers("/api/logout/**").permitAll() // 전체 접근 허용
+                .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated() // 인증된 사용자만 접근 가능
                 .and()
                 .exceptionHandling()

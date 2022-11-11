@@ -1,16 +1,10 @@
-package com.example.kakaoasset.elasticLib;
+package com.kakaoasset.portfolio.elasticsearch.elasticLib;
 
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.indexlifecycle.StartILMRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
