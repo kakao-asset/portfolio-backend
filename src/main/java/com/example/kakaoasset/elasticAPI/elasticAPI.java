@@ -46,12 +46,29 @@ public class elasticAPI {
 
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
-            JSONObject itme = new JSONObject();
-            itme.put("name", temp.getString("name"));
-            itme.put("symbolCode", temp.getString("symbolCode"));
-            itme.put("tradePrice", temp.getString("tradePrice"));
-            itme.put("timestamp", temp.getString("@timestamp"));
-            jsonarr.put(itme);
+//            JSONObject itme = new JSONObject();
+//            itme.put("change", temp.getString("change"));
+//            itme.put("high52wDate", temp.getString("high52wDate"));
+//            itme.put("listingDate", temp.getString("listingDate"));
+//            itme.put("low52wDate", temp.getString("low52wDate"));
+//            itme.put("name", temp.getString("name"));
+//            itme.put("sectorCode", temp.getString("sectorCode"));
+//            itme.put("sectorName", temp.getString("sectorName"));
+//            itme.put("symbolCode", temp.getString("symbolCode"));
+//            itme.put("datetime", temp.getString("datetime"));
+//            itme.put("accTradePrice",temp.getLong("accTradePrice"));
+//            itme.put("accTradeVolume",temp.getLong("accTradeVolume"));
+//            itme.put("bps",temp.getLong("bps"));
+//            itme.put("eps",temp.getLong("eps"));
+//            itme.put(,temp.getLong());
+//            itme.put(,temp.getLong());
+//            itme.put(,temp.getLong());
+//            itme.put(,temp.getLong());
+//            itme.put(,temp.getLong());
+
+
+
+            jsonarr.put(temp);
         }
 
         afterTime = System.currentTimeMillis();

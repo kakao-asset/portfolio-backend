@@ -45,12 +45,12 @@ public class ElasticsearchService {
 
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("sourceAsMap");
-            JSONObject itme = new JSONObject();
-            itme.put("name", temp.getString("name"));
-            itme.put("symbolCode", temp.getString("symbolCode"));
-            itme.put("tradePrice", temp.getString("tradePrice"));
-            itme.put("timestamp", temp.getString("@timestamp"));
-            jsonarr.put(itme);
+//            JSONObject itme = new JSONObject();
+//            itme.put("name", temp.getString("name"));
+//            itme.put("symbolCode", temp.getString("symbolCode"));
+//            itme.put("tradePrice", temp.getString("tradePrice"));
+//            itme.put("timestamp", temp.getString("@timestamp"));
+            jsonarr.put(temp);
         }
 
         System.out.println("lib "+json.getJSONObject("hits").getJSONArray("hits").length()+" stock data success");
