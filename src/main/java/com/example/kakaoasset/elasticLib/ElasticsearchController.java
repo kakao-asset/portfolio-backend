@@ -1,7 +1,9 @@
 package com.example.kakaoasset.elasticLib;
 
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.indexlifecycle.StartILMRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -20,38 +22,23 @@ public class ElasticsearchController {
     @RequestMapping(value = "/lib")
     public String lib(){
 
-        JSONArray jsonarr = new JSONArray();
+        JSONArray result;
 
-        try {
-            SearchResponse searchResponse = elasticsearchService.sampleQuery();
+        long beforeTime;
+        long afterTime;
+        double secDiffTime;
 
-            JSONObject json = new JSONObject(searchResponse);
-
-            System.out.println("-------------------------------lib---------------------------");
-
-            System.out.println("json = " + json);
-
-            for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
-                JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("sourceAsMap");
-                String name = temp.getString("name");
-                String code = temp.getString("symbolCode");
-                int tradePrice = temp.getInt("tradePrice");
-                System.out.println(name + ", " + code + ", " + tradePrice);
-
-                JSONObject itme = new JSONObject();
-                itme.put("name", temp.getString("name"));
-                itme.put("symbolCode", temp.getString("symbolCode"));
-                itme.put("tradePrice", temp.getInt("tradePrice"));
-
-                jsonarr.put(itme);
-
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        // send request
+        beforeTime = System.currentTimeMillis();
+        result = elasticsearchService.sampleQuery();
+        if (result == null){
+            return new JSONObject("{\"error\":\"No Index\"}").toString();
         }
+        System.out.println("-------------------------------lib---------------------------");
 
-
-        return jsonarr.toString();
+        afterTime = System.currentTimeMillis();
+        secDiffTime = (afterTime - beforeTime);
+        System.out.println(secDiffTime + "ms");
+        return result.toString();
     }
 }
