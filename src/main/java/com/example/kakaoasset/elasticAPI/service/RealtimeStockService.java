@@ -1,28 +1,23 @@
-package com.example.kakaoasset.elasticAPI;
+package com.example.kakaoasset.elasticAPI.service;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-@RestController
-@CrossOrigin(origins = "*")
-public class elasticAPI {
 
-    @RequestMapping("/api")
-    public String api(){
+@Service
+public class RealtimeStockService {
 
+    public String selectRealtimeStock(String stock_name){
         String index = "stock-data";
-        String result = null;
         JSONArray jsonarr = new JSONArray();
-
-        long beforeTime;
-        long afterTime;
-        double secDiffTime;
+        String result = null;
 
         // make request for elasticsearch api
         RestTemplate restTemplate = new RestTemplate();
@@ -35,11 +30,11 @@ public class elasticAPI {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-            beforeTime = System.currentTimeMillis();
-            result = restTemplate.exchange("http://192.168.0.34:9200/"+index+"/_search?pretty&size=10000", HttpMethod.GET, entity, String.class).getBody();
+
+            result = restTemplate.exchange("http://192.168.0.34:9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+index+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+stock_name+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
@@ -50,11 +45,6 @@ public class elasticAPI {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
             jsonarr.put(temp);
         }
-
-        afterTime = System.currentTimeMillis();
-        secDiffTime = (afterTime - beforeTime);
-        System.out.println("api "+json.getJSONObject("hits").getJSONArray("hits").length()+" stock data success : " + secDiffTime);
         return jsonarr.toString();
     }
-
 }
