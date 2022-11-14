@@ -1,5 +1,4 @@
 package com.kakaoasset.portfolio.elasticsearch.elasticAPI.controller;
-
 import com.kakaoasset.portfolio.elasticsearch.elasticAPI.service.RealtimeStockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,7 @@ public class RealtimeStockController {
     private RealtimeStockService realtimeStockService;
 
     @RequestMapping(value = "/main/realtime", method = RequestMethod.GET)
-    public String tset(@RequestParam String stock_name){
+    public String realtimeStock(@RequestParam String stock_name){
 
         String result = null;
 
@@ -28,6 +27,8 @@ public class RealtimeStockController {
         secDiffTime = (afterTime - beforeTime);
 
         System.out.println("time : "+secDiffTime);
+        System.out.println("##############");
+        System.out.println(result);
         return result;
     }
 }

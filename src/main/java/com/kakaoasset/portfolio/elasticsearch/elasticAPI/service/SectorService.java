@@ -1,9 +1,8 @@
 package com.kakaoasset.portfolio.elasticsearch.elasticAPI.service;
 
-
-import org.springframework.beans.factory.annotation.Value;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,14 +12,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-@Service
-public class RealtimeStockService {
+/**
+ * packageName    : com.kakaoasset.portfolio.elasticsearch.elasticAPI.service
+ * fileName       : SectorService
+ * author         : Hwang
+ * date           : 2022-11-14
+ */
 
+@Service
+public class SectorService {
     @Value("${elasticsearch.host}")
     private String host;
 
-    public String selectRealtimeStock(String stock_name){
-        String index = "stock-data-test";
+    public String selectSectorStock(String stock_sector){
+        String index = "stock-data";
         JSONArray jsonarr = new JSONArray();
         String result = null;
 
@@ -36,20 +41,21 @@ public class RealtimeStockService {
         try {
             // send request to elasticsearch
 
-            result = restTemplate.exchange("http://"+host+":9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
+            result = restTemplate.exchange("http://"+host+":9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_sector, HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+stock_name+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\", \"sector\":\""+stock_sector+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
 
-        System.out.println("-------------------------------api-realtime-stock---------------------------");
+        System.out.println("-------------------------------api-stock-sector--------------------------");
+
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
-            System.out.println("temp ::: " + temp.toString());
             jsonarr.put(temp);
         }
         return jsonarr.toString();
     }
+
 }
