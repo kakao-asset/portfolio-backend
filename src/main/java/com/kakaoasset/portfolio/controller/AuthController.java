@@ -47,7 +47,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout/{userId}")
-    public ResponseEntity<BasicResponse> logout(@PathVariable("userId") String userId){
+    public ResponseEntity<BasicResponse> logout(@PathVariable("userId") Long userId){
         // 카카오에 연결 끊기 요청 및 레디스에서 리프레시 토큰 삭제
         authService.logout(userId);
 
@@ -59,6 +59,21 @@ public class AuthController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @DeleteMapping("/unlink/{userId}")
+    public ResponseEntity<BasicResponse> unlink(@PathVariable("userId") Long userId){
+        // 카카오에 연결 끊기 요청 및 레디스에서 리프레시 토큰 삭제
+        authService.logout(userId);
+
+        BasicResponse response = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("회원탈퇴에 성공했습니다.")
+                .data(Collections.emptyList())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     @GetMapping("/bridge")
     public ResponseEntity<BasicResponse> moveMain(@RequestHeader String token){
@@ -79,8 +94,6 @@ public class AuthController {
 
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
-
-
     }
 }
 
