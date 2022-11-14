@@ -1,4 +1,5 @@
-package com.kakaoasset.portfolio.elasticsearch.elasticAPI.service;
+package com.example.kakaoasset.elasticAPI.service;
+
 
 
 import org.json.JSONArray;
