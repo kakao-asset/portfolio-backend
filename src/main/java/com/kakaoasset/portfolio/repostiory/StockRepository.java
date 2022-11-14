@@ -8,11 +8,9 @@ import java.util.List;
 
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
-    // SQL 일반 파라미터 쿼리, @Param 사용 O
-    //@Query("select s from Stock s where s.stockCode=?1 and s.member.memberId=?2")
-    Stock findByStockCodeAndMember_MemberId(String stockCode, Long id);
+    Stock findByStockNameAndMember_MemberId(String stockName, Long id);
 
     List<Stock> findByMember_MemberId(Long id);
-    void deleteByStockCodeAndMember_MemberId(String stockCode, Long id);
+    void deleteByStockNameAndMember_MemberId(String stockName, Long id);
 
 }
