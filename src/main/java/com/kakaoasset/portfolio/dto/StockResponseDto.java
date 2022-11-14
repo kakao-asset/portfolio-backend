@@ -8,5 +8,5 @@ import lombok.Getter;
 public class StockResponseDto {
     private int avgPrice;
     private int quantity;
-    private String stockCode;
+    private String stockName;
 }

@@ -22,8 +22,8 @@ public class Stock {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(name = "stock_code")
-    String stockCode;
+    @Column(name = "stock_name")
+    private String stockName;
 
     int quantity;
 
@@ -31,7 +31,7 @@ public class Stock {
 
     public StockResponseDto toDto(){
         return StockResponseDto.builder()
-                .stockCode(stockCode)
+                .stockName(stockName)
                 .quantity(quantity)
                 .avgPrice(avgPrice)
                 .build();

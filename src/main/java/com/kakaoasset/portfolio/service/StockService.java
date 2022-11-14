@@ -23,7 +23,7 @@ public class StockService {
     private final MemberRepository memberRepository;
 
     public StockResponseDto buyStock(Long id, StockRequestDto stockDto){
-        Stock stock = stockRepository.findByStockCodeAndMember_MemberId(stockDto.getStockCode(), id);
+        Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockDto.getStockName(), id);
 
         if(stock == null){
             stock = stockDto.toEntity(memberRepository.findByMemberId(id));
@@ -38,7 +38,7 @@ public class StockService {
 
         stockRepository.save(stock);
         return StockResponseDto.builder()
-                .stockCode(stock.getStockCode())
+                .stockName(stock.getStockName())
                 .avgPrice(stock.getAvgPrice())
                 .quantity(stock.getQuantity())
                 .build();
@@ -46,12 +46,12 @@ public class StockService {
 
     @Transactional
     public Object sellStock(Long id, StockRequestDto stockDto){
-        Stock stock = stockRepository.findByStockCodeAndMember_MemberId(stockDto.getStockCode(), id);
+        Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockDto.getStockName(), id);
 
         int quantity = stock.getQuantity() - stockDto.getQuantity();
         // 전량 매도
         if (quantity == 0) {
-            stockRepository.deleteByStockCodeAndMember_MemberId(stockDto.getStockCode(), id);
+            stockRepository.deleteByStockNameAndMember_MemberId(stockDto.getStockName(), id);
             return "delete";
         } else if(quantity < 0){
             return "sell count error";
@@ -59,7 +59,7 @@ public class StockService {
             stock.setQuantity(quantity);
             stockRepository.save(stock);
             return StockResponseDto.builder()
-                    .stockCode(stock.getStockCode())
+                    .stockName(stock.getStockName())
                     .avgPrice(stock.getAvgPrice())
                     .quantity(stock.getQuantity())
                     .build();
