@@ -37,6 +37,7 @@ public class StockService {
         stockRepository.save(stock);
         return StockResponseDto.builder()
                 .stockName(stock.getStockName())
+                .stockCode(stock.getStockCode())
                 .avgPrice(stock.getAvgPrice())
                 .quantity(stock.getQuantity())
                 .sectorCode(stock.getSectorCode())
@@ -60,6 +61,7 @@ public class StockService {
             stockRepository.save(stock);
             return StockResponseDto.builder()
                     .stockName(stock.getStockName())
+                    .stockCode(stock.getStockCode())
                     .avgPrice(stock.getAvgPrice())
                     .quantity(stock.getQuantity())
                     .sectorCode(stock.getSectorCode())

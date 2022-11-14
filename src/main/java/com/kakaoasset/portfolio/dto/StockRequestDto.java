@@ -9,6 +9,7 @@ public class StockRequestDto {
     private int price;
     private int quantity;
     private String stockName;
+    private String stockCode;
     private String sectorCode;
 
     public Stock toEntity(Member member) {

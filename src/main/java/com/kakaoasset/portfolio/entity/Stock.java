@@ -25,16 +25,20 @@ public class Stock {
     @Column(name = "stock_name")
     private String stockName;
 
+    @Column(name = "stock_code")
+    private String stockCode;
+
     @Column(name = "sector_code")
     private String sectorCode;
 
-    int quantity;
+    private int quantity;
 
-    int avgPrice;
+    private int avgPrice;
 
     public StockResponseDto toDto(){
         return StockResponseDto.builder()
                 .stockName(stockName)
+                .stockCode(stockCode)
                 .quantity(quantity)
                 .avgPrice(avgPrice)
                 .sectorCode(sectorCode)

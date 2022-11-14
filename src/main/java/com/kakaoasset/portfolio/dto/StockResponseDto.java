@@ -9,5 +9,6 @@ public class StockResponseDto {
     private int avgPrice;
     private int quantity;
     private String stockName;
+    private String stockCode;
     private String sectorCode;
 }
