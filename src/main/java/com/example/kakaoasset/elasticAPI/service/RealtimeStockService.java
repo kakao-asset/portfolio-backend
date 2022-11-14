@@ -1,4 +1,5 @@
-package com.example.kakaoasset.elasticAPI.service;
+package com.kakaoasset.portfolio.elasticsearch.elasticAPI.service;
+
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,7 +40,7 @@ public class RealtimeStockService {
 
         JSONObject json = new JSONObject(result);
 
-        System.out.println("-------------------------------api---------------------------");
+        System.out.println("-------------------------------api-realtime-stock---------------------------");
 
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
