@@ -9,12 +9,14 @@ public class StockRequestDto {
     private int price;
     private int quantity;
     private String stockName;
+    private String sectorCode;
 
     public Stock toEntity(Member member) {
         return Stock.builder()
                 .member(member)
                 .stockName(stockName)
                 .avgPrice(price)
+                .sectorCode(sectorCode)
                 .quantity(quantity)
                 .build();
     }

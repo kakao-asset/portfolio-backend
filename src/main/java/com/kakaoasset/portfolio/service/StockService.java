@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,6 +39,7 @@ public class StockService {
                 .stockName(stock.getStockName())
                 .avgPrice(stock.getAvgPrice())
                 .quantity(stock.getQuantity())
+                .sectorCode(stock.getSectorCode())
                 .build();
     }
 
@@ -57,11 +56,13 @@ public class StockService {
             return "sell count error";
         } else {
             stock.setQuantity(quantity);
+            stock.setSectorCode(stock.getSectorCode());
             stockRepository.save(stock);
             return StockResponseDto.builder()
                     .stockName(stock.getStockName())
                     .avgPrice(stock.getAvgPrice())
                     .quantity(stock.getQuantity())
+                    .sectorCode(stock.getSectorCode())
                     .build();
         }
     }
