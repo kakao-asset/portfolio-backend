@@ -46,12 +46,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests() // 보호된 리소스 URI에 접근 가능한지 체크
-                .antMatchers("/api/**").permitAll()
-                .anyRequest().authenticated() // 인증된 사용자만 접근 가능
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                .and().addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+                .antMatchers("/**").permitAll();
+//                .anyRequest().authenticated() // 인증된 사용자만 접근 가능
+//                .and()
+//                .exceptionHandling()
+//                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+//                .and().addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
     }
 
     // CORS 허용적용
