@@ -43,7 +43,7 @@ public class NewsStockService {
         JSONObject json = new JSONObject(result);
         for (int i = 0; i < json.getJSONArray("data").length(); i++) {
             JSONObject temp = (JSONObject) json.getJSONArray("data").get(i);
-            String newsId = ((JSONObject)json.getJSONArray("data").get(0)).getString("newsId");
+            String newsId = ((JSONObject)json.getJSONArray("data").get(i)).getString("newsId");
             temp.put("detail_url", detail_url + stockCode + "#news/stock/" + newsId);
             jsonarr.put(temp);
         }
