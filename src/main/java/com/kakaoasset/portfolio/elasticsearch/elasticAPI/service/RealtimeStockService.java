@@ -35,19 +35,19 @@ public class RealtimeStockService {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-
-            result = restTemplate.exchange("http://"+host+":9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
+            result = restTemplate.exchange("http://192.168.0.34:9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
             return new JSONObject("{\"error\":\"No Index\", \"index\":\""+stock_name+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
-
+        //{"took":31,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":{"value":0,"relation":"eq"},"max_score":null,"hits":[]}}
         System.out.println("-------------------------------api-realtime-stock---------------------------");
+        System.out.println("len ::: " + json.getJSONObject("hits").getJSONArray("hits").length());
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
-            System.out.println("temp ::: " + temp.toString());
+//            System.out.println("temp ::: " + temp.toString());
             jsonarr.put(temp);
         }
         return jsonarr.toString();

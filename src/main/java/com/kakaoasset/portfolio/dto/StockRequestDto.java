@@ -18,6 +18,7 @@ public class StockRequestDto {
                 .stockName(stockName)
                 .avgPrice(price)
                 .sectorCode(sectorCode)
+                .stockCode(stockCode)
                 .quantity(quantity)
                 .build();
     }
