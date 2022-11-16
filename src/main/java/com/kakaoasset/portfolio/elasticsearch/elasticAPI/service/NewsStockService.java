@@ -41,14 +41,15 @@ public class NewsStockService {
 
         // 뉴스 크롤링에 대한 response + 상세페이지를 보여주기 위한 newsId
         JSONObject json = new JSONObject(result);
-        System.out.println(json.getJSONObject("data").getJSONArray("data"));
-        for (int i = 0; i < json.getJSONObject("data").getJSONArray("data").length(); i++) {
-            JSONObject temp = (JSONObject) json.getJSONArray("data").get(i);
-            String newsId = ((JSONObject)json.getJSONArray("data").get(i)).getString("newsId");
-            temp.put("detail_url", detail_url + stockCode + "#news/stock/" + newsId);
-            jsonarr.put(temp);
+        if(JSONObject.NULL != json.get("data")){
+            System.out.println(json.get("data").getClass().getName());
+            for (int i = 0; i < json.getJSONArray("data").length(); i++) {
+                JSONObject temp = (JSONObject) json.getJSONArray("data").get(i);
+                String newsId = ((JSONObject)json.getJSONArray("data").get(i)).getString("newsId");
+                temp.put("detail_url", detail_url + stockCode + "#news/stock/" + newsId);
+                jsonarr.put(temp);
+            }
         }
-
 
         return jsonarr.toString();
     }
