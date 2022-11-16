@@ -1,5 +1,6 @@
 package com.kakaoasset.portfolio.elasticsearch.elasticAPI.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +26,10 @@ public class SectorService {
     private String host;
 
     public String selectSectorStock(String stock_sector){
-        String index = "stock-data";
+        String index = "stock-data-test";
         JSONArray jsonarr = new JSONArray();
         String result = null;
+        String personResultAsJsonStr = null;
 
         // make request for elasticsearch api
         RestTemplate restTemplate = new RestTemplate();
@@ -37,23 +39,91 @@ public class SectorService {
             return response;
         });
         final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        String req_body = "{\n" +
+                "    \"size\": 0,\n" +
+                "    \"query\": {\n" +
+                "        \"term\": {\n" +
+                "            \"sectorCode.keyword\": {\n" +
+                "                \"value\": \""+stock_sector+"\",\n" +
+                "                \"boost\": 1.0\n" +
+                "            }\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"_source\": false,\n" +
+                "    \"stored_fields\": \"none\",\n" +
+                "    \"aggregations\": {\n" +
+                "        \"groupby\": {\n" +
+                "            \"composite\": {\n" +
+                "                \"size\": 1000,\n" +
+                "                \"sources\": [\n" +
+                "                    {\n" +
+                "                        \"ad594295\": {\n" +
+                "                            \"terms\": {\n" +
+                "                                \"field\": \"name.keyword\",\n" +
+                "                                \"missing_bucket\": true,\n" +
+                "                                \"order\": \"asc\"\n" +
+                "                            }\n" +
+                "                        }\n" +
+                "                    }\n" +
+                "                ]\n" +
+                "            },\n" +
+                "            \"aggregations\": {\n" +
+                "                \"cae43aee\": {\n" +
+                "                    \"top_hits\": {\n" +
+                "                        \"from\": 0,\n" +
+                "                        \"size\": 1,\n" +
+                "                        \"version\": false,\n" +
+                "                        \"seq_no_primary_term\": false,\n" +
+                "                        \"explain\": false,\n" +
+                "                        \"docvalue_fields\": [\n" +
+                "                            {\n" +
+                "                                \"field\": \"datetime.keyword\"\n" +
+                "                            }\n" +
+                "                        ],\n" +
+                "                        \"sort\": [\n" +
+                "                            {\n" +
+                "                                \"datetime.keyword\": {\n" +
+                "                                    \"order\": \"desc\",\n" +
+                "                                    \"missing\": \"_last\",\n" +
+                "                                    \"unmapped_type\": \"text\"\n" +
+                "                                }\n" +
+                "                            }\n" +
+                "                        ]\n" +
+                "                    }\n" +
+                "                }\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
         try {
             // send request to elasticsearch
 
-            result = restTemplate.exchange("http://"+host+":9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_sector, HttpMethod.GET, entity, String.class).getBody();
+            JSONObject req_json = new JSONObject(req_body);
+
+            HttpEntity<String> request =
+                    new HttpEntity<String>(req_json.toString(), headers);
+
+            personResultAsJsonStr =
+                    restTemplate.postForObject("http://"+host+":9200/"+index+"/_search", request, String.class);
+
         }catch (HttpClientErrorException e){
             // no index
+            System.out.println("e = " + e);
             return new JSONObject("{\"error\":\"No Index\", \"sector\":\""+stock_sector+"\"}").toString();
         }
 
-        JSONObject json = new JSONObject(result);
+        JSONObject json = new JSONObject(personResultAsJsonStr);
 
         System.out.println("-------------------------------api-stock-sector--------------------------");
 
-        for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
-            JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
+        for (int i = 0; i < json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").length(); i++) {
+            JSONObject temp = ((JSONObject) ((JSONObject) json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").get(i)).getJSONObject("cae43aee").getJSONObject("hits").getJSONArray("hits").get(0)).getJSONObject("_source");
             jsonarr.put(temp);
+
+
         }
         return jsonarr.toString();
     }
