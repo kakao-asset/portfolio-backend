@@ -26,9 +26,9 @@ public class RealtimeStockController {
         afterTime = System.currentTimeMillis();
         secDiffTime = (afterTime - beforeTime);
 
-        System.out.println("time : "+secDiffTime);
-        System.out.println("##############");
-        System.out.println(result);
+        // System.out.println("time : "+secDiffTime);
+        // System.out.println("##############");
+        // System.out.println(result);
         return result;
     }
 }
