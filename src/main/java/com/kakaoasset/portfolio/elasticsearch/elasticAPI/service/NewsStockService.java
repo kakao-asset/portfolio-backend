@@ -42,7 +42,6 @@ public class NewsStockService {
         // 뉴스 크롤링에 대한 response + 상세페이지를 보여주기 위한 newsId
         JSONObject json = new JSONObject(result);
         if(JSONObject.NULL != json.get("data")){
-            System.out.println(json.get("data").getClass().getName());
             for (int i = 0; i < json.getJSONArray("data").length(); i++) {
                 JSONObject temp = (JSONObject) json.getJSONArray("data").get(i);
                 String newsId = ((JSONObject)json.getJSONArray("data").get(i)).getString("newsId");
