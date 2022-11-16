@@ -63,7 +63,7 @@ public class AuthController {
     @DeleteMapping("/unlink/{userId}")
     public ResponseEntity<BasicResponse> unlink(@PathVariable("userId") Long userId){
         // 카카오에 연결 끊기 요청 및 레디스에서 리프레시 토큰 삭제
-        authService.logout(userId);
+        authService.unlink(userId);
 
         BasicResponse response = BasicResponse.builder()
                 .code(HttpStatus.OK.value())
