@@ -142,7 +142,7 @@ public class StockService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String url = "http://192.168.0.34:9200/"+index+"/_search";
+        String url = "http://192.168.0.34:9200/"+index+"/_search?size=15";
         System.out.println(word);
         String query = "{\n" +
                 "    \"query\" :{\n" +
@@ -151,7 +151,6 @@ public class StockService {
                 "        }\n" +
                 "    }\n" +
                 "}";
-
         HttpEntity<String> request = new HttpEntity<>(query, headers);
 
         try {

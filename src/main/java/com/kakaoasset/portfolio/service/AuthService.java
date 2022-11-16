@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -194,6 +195,7 @@ public class AuthService {
         redisTemplate.delete(String.valueOf(id));
     }
 
+    @Transactional
     public void unlink(Long id){
         RestTemplate rt = new RestTemplate();
 
