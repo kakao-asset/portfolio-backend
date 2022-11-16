@@ -128,7 +128,7 @@ public class SectorService {
             temp.put("accTradePrice", ((JSONObject) ((JSONObject) json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").get(i)).getJSONObject("cae43aee").getJSONObject("hits").getJSONArray("hits").get(0)).getJSONObject("_source").get("accTradePrice"));
             temp.put("marketCap", ((JSONObject) ((JSONObject) json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").get(i)).getJSONObject("cae43aee").getJSONObject("hits").getJSONArray("hits").get(0)).getJSONObject("_source").get("marketCap"));
             temp.put("foreignRatio", ((JSONObject) ((JSONObject) json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").get(i)).getJSONObject("cae43aee").getJSONObject("hits").getJSONArray("hits").get(0)).getJSONObject("_source").get("foreignRatio"));
-
+            temp.put("id", ((JSONObject) ((JSONObject) json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").get(i)).getJSONObject("cae43aee").getJSONObject("hits").getJSONArray("hits").get(0)).get("_id"));
 
             jsonarr.put(temp);
 
