@@ -67,4 +67,27 @@ public class StockController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/stock")
+    public ResponseEntity<BasicResponse> getAllStocks() {
+
+        BasicResponse response = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("총 주식 목록 조회에 성공했습니다.")
+                .data(stockService.getStockList())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/stock/search")
+    public ResponseEntity<BasicResponse> getMatch(@RequestParam ("word") String word) {
+        BasicResponse response = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("검색어 조회에 성공했습니다.")
+                .data(stockService.getMatchStockList(word))
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
