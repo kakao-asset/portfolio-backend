@@ -11,6 +11,7 @@ public class StockRequestDto {
     private String stockName;
     private String stockCode;
     private String sectorCode;
+    private String sectorName;
 
     public Stock toEntity(Member member) {
         return Stock.builder()
@@ -19,6 +20,7 @@ public class StockRequestDto {
                 .avgPrice(price)
                 .sectorCode(sectorCode)
                 .stockCode(stockCode)
+                .sectorName(sectorName)
                 .quantity(quantity)
                 .build();
     }

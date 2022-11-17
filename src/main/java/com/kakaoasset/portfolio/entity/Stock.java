@@ -31,6 +31,9 @@ public class Stock {
     @Column(name = "sector_code")
     private String sectorCode;
 
+    @Column(name = "sector_name")
+    private String sectorName;
+
     private int quantity;
 
     private int avgPrice;
@@ -41,6 +44,7 @@ public class Stock {
                 .stockCode(stockCode)
                 .quantity(quantity)
                 .avgPrice(avgPrice)
+                .sectorName(sectorName)
                 .sectorCode(sectorCode)
                 .build();
     }
