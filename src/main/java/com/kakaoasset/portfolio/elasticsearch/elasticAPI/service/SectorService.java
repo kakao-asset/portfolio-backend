@@ -26,7 +26,7 @@ public class SectorService {
     private String host;
 
     public String selectSectorStock(String stock_sector){
-        String index = "stock-data-test";
+        String index = "stock-data";
         JSONArray jsonarr = new JSONArray();
         String result = null;
         String personResultAsJsonStr = null;

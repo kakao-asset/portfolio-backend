@@ -20,7 +20,7 @@ public class RealtimeStockService {
     private String host;
 
     public String selectRealtimeStock(String stock_name){
-        String index = "stock-data-test";
+        String index = "stock-data";
         JSONArray jsonarr = new JSONArray();
         String result = null;
 
