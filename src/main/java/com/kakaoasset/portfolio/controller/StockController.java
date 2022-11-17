@@ -90,4 +90,15 @@ public class StockController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/stock/rank")
+    public ResponseEntity<BasicResponse> getRank() {
+        BasicResponse response = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("다음 실시간 검색어 순위 조회에 성공했습니다.")
+                .data(stockService.getDaumRank())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

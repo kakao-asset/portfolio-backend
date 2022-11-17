@@ -1,12 +1,14 @@
 package com.kakaoasset.portfolio.service;
 
 import com.kakaoasset.portfolio.dto.StockDto;
+import com.kakaoasset.portfolio.dto.StockRankDto;
 import com.kakaoasset.portfolio.dto.StockRequestDto;
 import com.kakaoasset.portfolio.dto.StockResponseDto;
 import com.kakaoasset.portfolio.entity.Stock;
 import com.kakaoasset.portfolio.repostiory.MemberRepository;
 import com.kakaoasset.portfolio.repostiory.StockRepository;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -101,7 +103,6 @@ public class StockService {
         try {
             // send request to elasticsearch
             String uri = "http://192.168.0.34:9200/"+index+"/_search?size=2000";
-            System.out.println("uri : " + uri);
             result = rt.exchange(uri, HttpMethod.GET, entity, String.class).getBody();
 
         }catch (HttpClientErrorException e){
@@ -175,5 +176,55 @@ public class StockService {
         }
 
         return stockList;
+    }
+
+    public Object getDaumRank(){
+        String index = "stock-rank";
+        String result;
+        // make request for elasticsearch api
+        RestTemplate rt = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/json");
+        HttpEntity<Object> entity = new HttpEntity<>(headers);
+
+        try {
+            // send request to elasticsearch
+            String uri = "http://192.168.0.34:9200/"+index+"/_search?";
+            System.out.println("uri : " + uri);
+            result = rt.exchange(uri,
+                    HttpMethod.GET,
+                    entity,
+                    String.class).getBody();
+
+        }catch (HttpClientErrorException e){
+            // no index
+            System.out.println(e);
+            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+index+"\"}").toString();
+        }
+
+        JSONObject json = new JSONObject(result);
+        List<StockRankDto> stockList = new LinkedList<>();
+        // String dataCnt = String.valueOf(json.getJSONObject("hits").getJSONObject("total").getNumber("value")); // 데이터 갯수
+
+
+        for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
+            JSONObject res = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
+
+            System.out.println(json.getJSONObject("hits").getJSONArray("hits").length());
+            System.out.println(json.getJSONObject("hits").getJSONArray("hits"));
+
+            StockRankDto stockRankDto = StockRankDto.builder()
+                    .rank(res.get("rank").toString())
+                    .name(res.get("name").toString())
+                    .symbolCode(res.get("symbolCode").toString())
+                    .build();
+
+            stockList.add(stockRankDto);
+        }
+
+        return stockList;
+
+
     }
 }
