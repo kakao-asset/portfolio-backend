@@ -10,6 +10,7 @@ import com.kakaoasset.portfolio.repostiory.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,6 +30,9 @@ public class StockService {
 
     private final StockRepository stockRepository;
     private final MemberRepository memberRepository;
+
+    @Value("${elasticsearch.host}")
+    private String host;
 
     public StockResponseDto buyStock(Long id, StockRequestDto stockDto){
         Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockDto.getStockName(), id);
@@ -104,7 +108,7 @@ public class StockService {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-            String uri = "http://192.168.0.34:9200/"+index+"/_search?size=2000";
+            String uri = "http://"+ host + ":9200/"+index+"/_search?size=2000";
             result = rt.exchange(uri, HttpMethod.GET, entity, String.class).getBody();
 
         }catch (HttpClientErrorException e){
@@ -145,7 +149,7 @@ public class StockService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String url = "http://192.168.0.34:9200/"+index+"/_search?size=15";
+        String url = "http://"+host+":9200/"+index+"/_search?size=15";
         System.out.println(word);
         String query = "{\n" +
                 "    \"query\" :{\n" +
@@ -192,7 +196,7 @@ public class StockService {
 
         try {
             // send request to elasticsearch
-            String uri = "http://192.168.0.34:9200/"+index+"/_search?";
+            String uri = "http://"+host+":9200/"+index+"/_search?";
             System.out.println("uri : " + uri);
             result = rt.exchange(uri,
                     HttpMethod.GET,

@@ -35,7 +35,7 @@ public class RealtimeStockService {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-            result = restTemplate.exchange("http://192.168.0.34:9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
+            result = restTemplate.exchange("http://"+host+":9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
             return new JSONObject("{\"error\":\"No Index\", \"index\":\""+stock_name+"\"}").toString();
