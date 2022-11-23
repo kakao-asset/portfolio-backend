@@ -37,6 +37,9 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Stock> stockList;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<StockHistory> stockHistoryList;
+
     @Builder
     public Member(String kakaoId, String profile, String nickname,
                   String email, String role) {
