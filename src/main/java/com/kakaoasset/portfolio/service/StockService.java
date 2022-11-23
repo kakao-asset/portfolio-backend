@@ -1,14 +1,12 @@
 package com.kakaoasset.portfolio.service;
 
-import com.kakaoasset.portfolio.dto.StockDto;
-import com.kakaoasset.portfolio.dto.StockRankDto;
-import com.kakaoasset.portfolio.dto.StockRequestDto;
-import com.kakaoasset.portfolio.dto.StockResponseDto;
+import com.kakaoasset.portfolio.dto.*;
 import com.kakaoasset.portfolio.entity.Stock;
+import com.kakaoasset.portfolio.entity.StockHistory;
 import com.kakaoasset.portfolio.repostiory.MemberRepository;
+import com.kakaoasset.portfolio.repostiory.StockHistoryRepository;
 import com.kakaoasset.portfolio.repostiory.StockRepository;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -21,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,27 +27,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StockService {
 
-    private final StockRepository stockRepository;
     private final MemberRepository memberRepository;
+    private final StockRepository stockRepository;
+    private final StockHistoryRepository stockHistoryRepository;
+
 
     @Value("${elasticsearch.host}")
     private String host;
 
-    public StockResponseDto buyStock(Long id, StockRequestDto stockDto){
-        Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockDto.getStockName(), id);
-
+    public StockResponseDto buyStock(Long id, StockRequestDto stockRequestDto){
+        Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockRequestDto.getStockName(), id);
+        System.out.println(stockRequestDto.getTradeTime());
+        System.out.println(stockRequestDto.getTradeTime());
+        System.out.println(stockRequestDto.getTradeTime());
         if(stock == null){
-            stock = stockDto.toEntity(memberRepository.findByMemberId(id));
+            stock = stockRequestDto.toStockEntity(memberRepository.findByMemberId(id));
         } else {
             int originQuantity = stock.getQuantity();
             int originPrice = stock.getAvgPrice();
-            int quantity = stockDto.getQuantity();
-            int price = stockDto.getPrice();
+            int quantity = stockRequestDto.getQuantity();
+            int price = stockRequestDto.getPrice();
             stock.setQuantity(originQuantity + quantity);
             stock.setAvgPrice((originQuantity * originPrice + quantity * price)/ stock.getQuantity());
         }
-
         stockRepository.save(stock);
+
+        StockHistory stockHistory = stockRequestDto.toStockHistoryEntity(memberRepository.findByMemberId(id), true);
+        stockHistoryRepository.save(stockHistory);
+
         return StockResponseDto.builder()
                 .stockName(stock.getStockName())
                 .stockCode(stock.getStockCode())
@@ -60,13 +66,17 @@ public class StockService {
     }
 
     @Transactional
-    public Object sellStock(Long id, StockRequestDto stockDto){
-        Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockDto.getStockName(), id);
+    public Object sellStock(Long id, StockRequestDto stockRequestDto){
+        Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockRequestDto.getStockName(), id);
 
-        int quantity = stock.getQuantity() - stockDto.getQuantity();
+        int quantity = stock.getQuantity() - stockRequestDto.getQuantity();
+
+        StockHistory stockHistory = stockRequestDto.toStockHistoryEntity(memberRepository.findByMemberId(id), false);
+        stockHistoryRepository.save(stockHistory);
+
         // 전량 매도
         if (quantity == 0) {
-            stockRepository.deleteByStockNameAndMember_MemberId(stockDto.getStockName(), id);
+            stockRepository.deleteByStockNameAndMember_MemberId(stockRequestDto.getStockName(), id);
             return "delete";
         } else if(quantity < 0){
             return "sell count error";
@@ -232,5 +242,24 @@ public class StockService {
         return stockList;
 
 
+    }
+
+    public List<HistoryResponseDto> getStockHistory(Long id){
+
+        List<StockHistory> stockHistoryList = stockHistoryRepository.findByMember_MemberId(id);
+        List<HistoryResponseDto> historyList = new ArrayList<>();
+        for(StockHistory sh: stockHistoryList) {
+            HistoryResponseDto stockHistory = HistoryResponseDto.builder()
+                    .stockName(sh.getStockName())
+                    .price(sh.getPrice())
+                    .quantity(sh.getQuantity())
+                    .tradeDate(sh.getTradeDate())
+                    .tradeType(sh.isTradeType())
+                    .tradeTime(sh.getTradeTime())
+                    .build();
+
+            historyList.add(stockHistory);
+        }
+        return historyList;
     }
 }

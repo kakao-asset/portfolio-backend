@@ -101,4 +101,14 @@ public class StockController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/stock-history/{userId}")
+    public ResponseEntity<BasicResponse> getStockHistory(@PathVariable("userId") Long userId) {
+        BasicResponse response = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("매도 매수 현황 조회에 성공했습니다.")
+                .data(stockService.getStockHistory(userId))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

@@ -4,6 +4,7 @@ import com.kakaoasset.portfolio.dto.StockResponseDto;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Builder
@@ -36,6 +37,7 @@ public class Stock {
 
     private int quantity;
 
+    @Column(name = "avg_price")
     private int avgPrice;
 
     public StockResponseDto toDto(){
