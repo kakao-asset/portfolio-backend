@@ -21,7 +21,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Date;
 import java.util.*;
 
 @Service
@@ -245,11 +244,12 @@ public class StockService {
 
     }
 
-    public HashMap<String, MultiValueMap> getStockHistory(Long id){
+    public List<HistoryListDto> getStockHistory(Long id){
 
         List<StockHistory> stockHistoryList = stockHistoryRepository.findByMember_MemberId(id);
         MultiValueMap<String, HistoryResponseDto> historyMap = new LinkedMultiValueMap<>();
 
+        JSONObject json = new JSONObject();
         for(StockHistory sh: stockHistoryList) {
             HistoryResponseDto data = HistoryResponseDto.builder()
                     .stockName(sh.getStockName())
@@ -260,8 +260,11 @@ public class StockService {
                     .build();
             historyMap.add(sh.getTradeDate().toString(), data);
         }
-        HashMap<String, MultiValueMap> map = new HashMap<>();
-        map.put("date", historyMap);
-        return map;
+        List<HistoryListDto> historyList = new ArrayList<>();
+        for(String date: historyMap.keySet()){
+            historyList.add(new HistoryListDto(date, historyMap.get(date)));
+        }
+
+        return historyList;
     }
 }
