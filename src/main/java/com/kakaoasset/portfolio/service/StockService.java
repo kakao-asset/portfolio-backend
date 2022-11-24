@@ -16,12 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.Date;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -244,22 +245,21 @@ public class StockService {
 
     }
 
-    public List<HistoryResponseDto> getStockHistory(Long id){
+    public MultiValueMap<String, HistoryResponseDto> getStockHistory(Long id){
 
         List<StockHistory> stockHistoryList = stockHistoryRepository.findByMember_MemberId(id);
-        List<HistoryResponseDto> historyList = new ArrayList<>();
+        MultiValueMap<String, HistoryResponseDto> historyMap = new LinkedMultiValueMap<>();
+
         for(StockHistory sh: stockHistoryList) {
-            HistoryResponseDto stockHistory = HistoryResponseDto.builder()
+            HistoryResponseDto data = HistoryResponseDto.builder()
                     .stockName(sh.getStockName())
                     .price(sh.getPrice())
                     .quantity(sh.getQuantity())
-                    .tradeDate(sh.getTradeDate())
                     .tradeType(sh.isTradeType())
                     .tradeTime(sh.getTradeTime())
                     .build();
-
-            historyList.add(stockHistory);
+            historyMap.add(sh.getTradeDate().toString(), data);
         }
-        return historyList;
+        return  historyMap;
     }
 }
