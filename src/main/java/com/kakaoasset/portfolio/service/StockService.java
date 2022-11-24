@@ -245,7 +245,7 @@ public class StockService {
 
     }
 
-    public MultiValueMap<String, HistoryResponseDto> getStockHistory(Long id){
+    public HashMap<String, MultiValueMap> getStockHistory(Long id){
 
         List<StockHistory> stockHistoryList = stockHistoryRepository.findByMember_MemberId(id);
         MultiValueMap<String, HistoryResponseDto> historyMap = new LinkedMultiValueMap<>();
@@ -260,6 +260,8 @@ public class StockService {
                     .build();
             historyMap.add(sh.getTradeDate().toString(), data);
         }
-        return  historyMap;
+        HashMap<String, MultiValueMap> map = new HashMap<>();
+        map.put("date", historyMap);
+        return map;
     }
 }
