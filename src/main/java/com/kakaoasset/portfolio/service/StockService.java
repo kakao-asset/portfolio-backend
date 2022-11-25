@@ -3,9 +3,11 @@ package com.kakaoasset.portfolio.service;
 import com.kakaoasset.portfolio.dto.*;
 import com.kakaoasset.portfolio.entity.Stock;
 import com.kakaoasset.portfolio.entity.StockHistory;
+import com.kakaoasset.portfolio.entity.Trend;
 import com.kakaoasset.portfolio.repostiory.MemberRepository;
 import com.kakaoasset.portfolio.repostiory.StockHistoryRepository;
 import com.kakaoasset.portfolio.repostiory.StockRepository;
+import com.kakaoasset.portfolio.repostiory.TrendRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,7 @@ public class StockService {
     private final StockRepository stockRepository;
     private final StockHistoryRepository stockHistoryRepository;
 
+    private final TrendRepository trendRepository;
 
     @Value("${elasticsearch.host}")
     private String host;
@@ -246,6 +249,7 @@ public class StockService {
 
     public List<HistoryListDto> getStockHistory(Long id){
 
+        // history만 주는 중
         List<StockHistory> stockHistoryList = stockHistoryRepository.findByMember_MemberId(id);
         MultiValueMap<String, HistoryResponseDto> historyMap = new LinkedMultiValueMap<>();
 
@@ -261,10 +265,32 @@ public class StockService {
             historyMap.add(sh.getTradeDate().toString(), data);
         }
         List<HistoryListDto> historyList = new ArrayList<>();
+
         for(String date: historyMap.keySet()){
             historyList.add(new HistoryListDto(date, historyMap.get(date)));
         }
 
         return historyList;
+    }
+
+    public List<TrendDto> getTrendList(Long id){
+        List<Trend> trends = trendRepository.findByMemberId(id);
+        MultiValueMap<String, TrendDto.TrendData> trendMap= new LinkedMultiValueMap<>();
+
+        for(Trend t: trends) {
+            trendMap.add(t.getDate().toString(), t.toDto());
+        }
+
+        List<TrendDto> trendDtoList = new ArrayList<>();
+        for(String date: trendMap.keySet()){
+            TrendDto trendDto = TrendDto.builder()
+                    .date(date)
+                    .trndDataList(trendMap.get(date))
+                    .build();
+
+            trendDtoList.add(trendDto);
+        }
+
+        return trendDtoList;
     }
 }
