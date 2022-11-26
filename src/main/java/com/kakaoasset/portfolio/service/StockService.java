@@ -282,10 +282,13 @@ public class StockService {
         }
 
         List<TrendDto> trendDtoList = new ArrayList<>();
-        for(String date: trendMap.keySet()){
+
+        List<String> keyList = new ArrayList<>(trendMap.keySet());
+        Collections.sort(keyList);
+        for(String date: keyList){
             TrendDto trendDto = TrendDto.builder()
                     .date(date)
-                    .trndDataList(trendMap.get(date))
+                    .trendDataList(trendMap.get(date))
                     .build();
 
             trendDtoList.add(trendDto);

@@ -10,7 +10,7 @@ public class TrendDto {
 
     private String date;
 
-    private List<TrendData> trndDataList;
+    private List<TrendData> trendDataList;
 
     @Getter
     @Builder
