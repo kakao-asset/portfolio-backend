@@ -1,13 +1,11 @@
 package com.kakaoasset.portfolio.service;
 
 import com.kakaoasset.portfolio.dto.*;
+import com.kakaoasset.portfolio.entity.Asset;
 import com.kakaoasset.portfolio.entity.Stock;
 import com.kakaoasset.portfolio.entity.StockHistory;
 import com.kakaoasset.portfolio.entity.Trend;
-import com.kakaoasset.portfolio.repostiory.MemberRepository;
-import com.kakaoasset.portfolio.repostiory.StockHistoryRepository;
-import com.kakaoasset.portfolio.repostiory.StockRepository;
-import com.kakaoasset.portfolio.repostiory.TrendRepository;
+import com.kakaoasset.portfolio.repostiory.*;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,8 +30,8 @@ public class StockService {
     private final MemberRepository memberRepository;
     private final StockRepository stockRepository;
     private final StockHistoryRepository stockHistoryRepository;
-
     private final TrendRepository trendRepository;
+    private final AssetRepository assetRepository;
 
     @Value("${elasticsearch.host}")
     private String host;
@@ -295,5 +293,25 @@ public class StockService {
         }
 
         return trendDtoList;
+    }
+
+    public CashDto getCash(Long id){
+        return new CashDto(assetRepository.findByMemberId(id).get().getCash());
+    }
+
+    public String updateCash(Long id, CashDto cashDto){
+        Asset asset = assetRepository.findByMemberId(id).orElse(null);
+        if(asset == null) {
+            asset = Asset.builder()
+                    .id(id)
+                    .cash(cashDto.getCash())
+                    .build();
+        } else {
+            asset.updateCash(asset.getCash() + cashDto.getCash());
+        }
+
+        assetRepository.save(asset);
+
+        return "d";
     }
 }

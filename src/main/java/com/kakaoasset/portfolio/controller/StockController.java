@@ -1,6 +1,7 @@
 package com.kakaoasset.portfolio.controller;
 
 import com.kakaoasset.portfolio.dto.BasicResponse;
+import com.kakaoasset.portfolio.dto.CashDto;
 import com.kakaoasset.portfolio.dto.StockRequestDto;
 import com.kakaoasset.portfolio.dto.StockResponseDto;
 import com.kakaoasset.portfolio.service.StockService;
@@ -118,6 +119,26 @@ public class StockController {
                 .code(HttpStatus.OK.value())
                 .message("자산 동향 내역 조회에 성공했습니다.")
                 .data(stockService.getTrendList(userId))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/cash/{userId}")
+    public ResponseEntity<BasicResponse> getCash(@PathVariable("userId") Long userId) {
+        BasicResponse response = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("현금 조회에 성공했습니다.")
+                .data(stockService.getCash(userId))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/cash/{userId}")
+    public ResponseEntity<BasicResponse> updateCash(@PathVariable("userId") Long userId, @RequestBody CashDto cashDto) {
+        BasicResponse response = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("보유 현금 금액 변경에 성공했습니다.")
+                .data(stockService.updateCash(userId, cashDto))
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
