@@ -15,20 +15,8 @@ public class RealtimeStockController {
 
         String result = null;
 
-        long beforeTime;
-        long afterTime;
-        double secDiffTime;
-
-        beforeTime = System.currentTimeMillis();
-
         result = realtimeStockService.selectRealtimeStock(stock_name);
 
-        afterTime = System.currentTimeMillis();
-        secDiffTime = (afterTime - beforeTime);
-
-        // System.out.println("time : "+secDiffTime);
-        // System.out.println("##############");
-        // System.out.println(result);
         return result;
     }
 }

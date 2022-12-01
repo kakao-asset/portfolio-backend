@@ -117,8 +117,6 @@ public class SectorService {
 
         JSONObject json = new JSONObject(personResultAsJsonStr);
 
-        System.out.println("-------------------------------api-stock-sector--------------------------");
-
         for (int i = 0; i < json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").length(); i++) {
             JSONObject temp = new JSONObject();
             temp.put("name",((JSONObject) ((JSONObject) json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").get(i)).getJSONObject("cae43aee").getJSONObject("hits").getJSONArray("hits").get(0)).getJSONObject("_source").get("name"));
