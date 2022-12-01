@@ -51,9 +51,6 @@ public class SearchRankService {
         }
 
         JSONObject json = new JSONObject(result);
-
-        System.out.println("-------------------------------api-search-rank---------------------------");
-
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
             jsonarr.put(temp);

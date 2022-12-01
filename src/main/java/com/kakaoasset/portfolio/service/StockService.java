@@ -48,10 +48,16 @@ public class StockService {
             stock.setQuantity(originQuantity + quantity);
             stock.setAvgPrice((originQuantity * originPrice + quantity * price)/ stock.getQuantity());
         }
-        stockRepository.save(stock);
 
         StockHistory stockHistory = stockRequestDto.toStockHistoryEntity(memberRepository.findByMemberId(id), true);
+
+        Optional<Asset> asset = assetRepository.findByMemberId(id);
+        asset.get().updateCash(asset.get().getCash() - (stockRequestDto.getPrice() * stockRequestDto.getQuantity()));
+        asset.get().updateBuyPrice(asset.get().getBuyPrice() + (stockRequestDto.getPrice() * stockRequestDto.getQuantity()));
+
+        stockRepository.save(stock);
         stockHistoryRepository.save(stockHistory);
+        assetRepository.save(asset.get());
 
         return StockResponseDto.builder()
                 .stockName(stock.getStockName())
@@ -70,7 +76,13 @@ public class StockService {
         int quantity = stock.getQuantity() - stockRequestDto.getQuantity();
 
         StockHistory stockHistory = stockRequestDto.toStockHistoryEntity(memberRepository.findByMemberId(id), false);
+
+        Optional<Asset> asset = assetRepository.findByMemberId(id);
+        asset.get().updateCash(asset.get().getCash() + (stockRequestDto.getPrice() * stockRequestDto.getQuantity()));
+        asset.get().updateBuyPrice(asset.get().getBuyPrice() - (stock.getAvgPrice() * stock.getQuantity()));
+
         stockHistoryRepository.save(stockHistory);
+        assetRepository.save(asset.get());
 
         // 전량 매도
         if (quantity == 0) {
@@ -286,11 +298,11 @@ public class StockService {
         return trendDtoList;
     }
 
-    public CashDto getCash(Long id){
-        return new CashDto(assetRepository.findByMemberId(id).get().getCash());
+    public Object getCash(Long id){
+        return assetRepository.findByMemberId(id).isPresent() ? new CashDto(assetRepository.findByMemberId(id).get().getCash()) : Collections.emptyList();
     }
 
-    public String updateCash(Long id, CashDto cashDto){
+    public List<Object> updateCash(Long id, CashDto cashDto){
         Asset asset = assetRepository.findByMemberId(id).orElse(null);
         if(asset == null) {
             asset = Asset.builder()
@@ -303,6 +315,6 @@ public class StockService {
 
         assetRepository.save(asset);
 
-        return "d";
+        return Collections.emptyList();
     }
 }
