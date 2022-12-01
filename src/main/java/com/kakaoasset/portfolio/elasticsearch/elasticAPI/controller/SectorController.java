@@ -23,18 +23,7 @@ public class SectorController {
 
         String result = null;
 
-        long beforeTime;
-        long afterTime;
-        double secDiffTime;
-
-        beforeTime = System.currentTimeMillis();
-
         result = sectorService.selectSectorStock(stock_sector);
-
-        afterTime = System.currentTimeMillis();
-        secDiffTime = (afterTime - beforeTime);
-
-        System.out.println("time : " + secDiffTime);
 
         return result;
     }

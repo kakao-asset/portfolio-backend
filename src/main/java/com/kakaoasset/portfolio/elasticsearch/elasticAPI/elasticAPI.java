@@ -44,16 +44,11 @@ public class elasticAPI {
 
         JSONObject json = new JSONObject(result);
 
-        System.out.println("-------------------------------api---------------------------");
-
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject temp = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
             jsonarr.put(temp);
         }
 
-        afterTime = System.currentTimeMillis();
-        secDiffTime = (afterTime - beforeTime);
-        System.out.println("api "+json.getJSONObject("hits").getJSONArray("hits").length()+" stock data success : " + secDiffTime);
         return jsonarr.toString();
     }
 

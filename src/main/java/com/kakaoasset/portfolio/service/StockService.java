@@ -38,9 +38,6 @@ public class StockService {
 
     public StockResponseDto buyStock(Long id, StockRequestDto stockRequestDto){
         Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockRequestDto.getStockName(), id);
-        System.out.println(stockRequestDto.getTradeTime());
-        System.out.println(stockRequestDto.getTradeTime());
-        System.out.println(stockRequestDto.getTradeTime());
         if(stock == null){
             stock = stockRequestDto.toStockEntity(memberRepository.findByMemberId(id));
         } else {
@@ -161,7 +158,6 @@ public class StockService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         String url = "http://"+host+":9200/"+index+"/_search?size=15";
-        System.out.println(word);
         String query = "{\n" +
                 "    \"query\" :{\n" +
                 "        \"prefix\": {\n" +
@@ -208,7 +204,6 @@ public class StockService {
         try {
             // send request to elasticsearch
             String uri = "http://"+host+":9200/"+index+"/_search?";
-            System.out.println("uri : " + uri);
             result = rt.exchange(uri,
                     HttpMethod.GET,
                     entity,
@@ -224,12 +219,8 @@ public class StockService {
         List<StockRankDto> stockList = new LinkedList<>();
         // String dataCnt = String.valueOf(json.getJSONObject("hits").getJSONObject("total").getNumber("value")); // 데이터 갯수
 
-
         for (int i = 0; i < json.getJSONObject("hits").getJSONArray("hits").length(); i++) {
             JSONObject res = ((JSONObject) json.getJSONObject("hits").getJSONArray("hits").get(i)).getJSONObject("_source");
-
-            System.out.println(json.getJSONObject("hits").getJSONArray("hits").length());
-            System.out.println(json.getJSONObject("hits").getJSONArray("hits"));
 
             StockRankDto stockRankDto = StockRankDto.builder()
                     .rank(res.get("rank").toString())
