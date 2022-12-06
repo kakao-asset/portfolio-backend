@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collection;
+import java.util.Collections;
+
 @Service
 public class NewsStockService {
-    public String selectNewsStock(String stockCode) {
+    public Object selectNewsStock(String stockCode) {
         String result = "";
         JSONArray jsonarr = new JSONArray();
         String detail_url = "https://finance.daum.net/quotes/";
@@ -32,11 +35,10 @@ public class NewsStockService {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-
             result = restTemplate.exchange("https://finance.daum.net/content/news?page=1&perPage=5&category=economy&searchType=all&keyword=" + stockCode, HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+stockCode+"\"}").toString();
+            return Collections.emptyList();
         }
 
         // 뉴스 크롤링에 대한 response + 상세페이지를 보여주기 위한 newsId
