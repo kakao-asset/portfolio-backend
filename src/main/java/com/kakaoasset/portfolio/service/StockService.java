@@ -248,11 +248,12 @@ public class StockService {
 
     }
 
-    public List<HistoryListDto> getStockHistory(Long id){
+    public List<HistoryResponseDto> getStockHistory(Long id){
 
         // history만 주는 중
         List<StockHistory> stockHistoryList = stockHistoryRepository.findByMember_MemberId(id);
-        MultiValueMap<String, HistoryResponseDto> historyMap = new LinkedMultiValueMap<>();
+
+        List<HistoryResponseDto> historyList = new ArrayList<>();
 
         JSONObject json = new JSONObject();
         for(StockHistory sh: stockHistoryList) {
@@ -261,14 +262,10 @@ public class StockService {
                     .price(sh.getPrice())
                     .quantity(sh.getQuantity())
                     .tradeType(sh.isTradeType())
+                    .tradeDate(String.valueOf(sh.getTradeDate()))
                     .tradeTime(sh.getTradeTime())
                     .build();
-            historyMap.add(sh.getTradeDate().toString(), data);
-        }
-        List<HistoryListDto> historyList = new ArrayList<>();
-
-        for(String date: historyMap.keySet()){
-            historyList.add(new HistoryListDto(date, historyMap.get(date)));
+            historyList.add(data);
         }
 
         return historyList;

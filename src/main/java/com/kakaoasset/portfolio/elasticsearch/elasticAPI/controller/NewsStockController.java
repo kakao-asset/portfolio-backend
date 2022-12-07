@@ -14,8 +14,6 @@ public class NewsStockController {
     @RequestMapping(value = "/main/news", method = RequestMethod.GET)
     public Object news(@RequestParam String stockCode) {
         Object result = newsStockService.selectNewsStock(stockCode);
-        System.out.println("------------------------------------------");
-        System.out.println(result);
         return result;
     }
 }
