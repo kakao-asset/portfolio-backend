@@ -20,7 +20,7 @@ public class NewsStockService {
         String result = "";
         JSONArray jsonarr = new JSONArray();
         String detail_url = "https://finance.daum.net/quotes/";
-
+        System.out.println("sibal sibal sibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibal");
         // make request for elasticsearch api
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add((request, body, execution) -> {
@@ -38,7 +38,6 @@ public class NewsStockService {
             result = restTemplate.exchange("https://finance.daum.net/content/news?page=1&perPage=5&category=economy&searchType=all&keyword=" + stockCode, HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
-            System.out.println("sibal sibal sibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibal");
             return Collections.emptyList();
         }
 
