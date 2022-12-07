@@ -38,6 +38,7 @@ public class NewsStockService {
             result = restTemplate.exchange("https://finance.daum.net/content/news?page=1&perPage=5&category=economy&searchType=all&keyword=" + stockCode, HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
+            System.out.println("sibal sibal sibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibalsibal");
             return Collections.emptyList();
         }
 
