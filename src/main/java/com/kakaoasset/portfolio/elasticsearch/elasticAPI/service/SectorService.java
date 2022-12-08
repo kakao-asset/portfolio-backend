@@ -133,10 +133,6 @@ public class SectorService {
             jsonarr.put(temp);
         }
 
-        for (int i = 0; i < jsonarr.length(); i++) {
-            System.out.println(jsonarr.get(i));
-        }
-
         return jsonarr.toString();
     }
 

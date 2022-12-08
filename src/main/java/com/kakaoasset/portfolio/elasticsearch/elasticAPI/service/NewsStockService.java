@@ -52,6 +52,8 @@ public class NewsStockService {
             }
         }
 
+        System.out.println("test");
+
         return jsonarr.toString();
     }
 }
