@@ -36,6 +36,12 @@ public class StockService {
     @Value("${elasticsearch.host}")
     private String host;
 
+    @Value("${index.stock-rank-index}")
+    private String rankIndex;
+
+    @Value("${index.stock-list-index}")
+    private String listIndex;
+
     public StockResponseDto buyStock(Long id, StockRequestDto stockRequestDto){
         Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockRequestDto.getStockName(), id);
         if(stock == null){
@@ -115,7 +121,6 @@ public class StockService {
     }
 
     public Object getStockList(){
-        String index = "stock-code-list";
         String result;
         // make request for elasticsearch api
         RestTemplate rt = new RestTemplate();
@@ -128,13 +133,13 @@ public class StockService {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-            String uri = "http://"+ host + ":9200/"+index+"/_search?size=2000";
+            String uri = "http://"+ host + ":9200/"+listIndex+"/_search?size=2000";
             result = rt.exchange(uri, HttpMethod.GET, entity, String.class).getBody();
 
         }catch (HttpClientErrorException e){
             // no index
             System.out.println(e);
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+index+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+listIndex+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
@@ -156,7 +161,6 @@ public class StockService {
     }
 
     public Object getMatchStockList(String word){
-        String index = "stock-code-list";
         String result;
         // make request for elasticsearch api
         RestTemplate rt = new RestTemplate();
@@ -169,7 +173,7 @@ public class StockService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String url = "http://"+host+":9200/"+index+"/_search?size=15";
+        String url = "http://"+host+":9200/"+listIndex+"/_search?size=15";
         String query = "{\n" +
                 "    \"query\" :{\n" +
                 "        \"prefix\": {\n" +
@@ -184,7 +188,7 @@ public class StockService {
         }catch (HttpClientErrorException e){
             // no index
             System.out.println(e);
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+index+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+listIndex+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
@@ -204,7 +208,6 @@ public class StockService {
     }
 
     public Object getDaumRank(){
-        String index = "stock-rank";
         String result;
         // make request for elasticsearch api
         RestTemplate rt = new RestTemplate();
@@ -215,7 +218,7 @@ public class StockService {
 
         try {
             // send request to elasticsearch
-            String uri = "http://"+host+":9200/"+index+"/_search?";
+            String uri = "http://"+host+":9200/"+rankIndex+"/_search?";
             result = rt.exchange(uri,
                     HttpMethod.GET,
                     entity,
@@ -224,7 +227,7 @@ public class StockService {
         }catch (HttpClientErrorException e){
             // no index
             System.out.println(e);
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+index+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+rankIndex+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
