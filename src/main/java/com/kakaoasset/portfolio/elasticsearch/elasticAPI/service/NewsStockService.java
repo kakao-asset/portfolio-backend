@@ -20,7 +20,7 @@ public class NewsStockService {
         String result = "";
         JSONArray jsonarr = new JSONArray();
         String detail_url = "https://finance.daum.net/quotes/";
-
+        System.out.println("rs test");
         // make request for elasticsearch api
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add((request, body, execution) -> {
