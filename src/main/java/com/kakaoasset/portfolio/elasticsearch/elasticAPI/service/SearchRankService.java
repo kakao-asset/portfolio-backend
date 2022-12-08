@@ -26,9 +26,11 @@ public class SearchRankService {
     @Value("${elasticsearch.host}")
     private String host;
 
-    public String selectSearchRank(){
+    @Value("${index.stock-rank-index}")
+    private String rankIndex;
 
-        String index = "stock-rank";
+
+    public String selectSearchRank(){
         JSONArray jsonarr = new JSONArray();
         String result = null;
 
@@ -44,7 +46,7 @@ public class SearchRankService {
         try {
             // send request to elasticsearch
 
-            result = restTemplate.exchange("http://"+host+":9200/"+index+"/_search?sort=datetime:acs", HttpMethod.GET, entity, String.class).getBody();
+            result = restTemplate.exchange("http://"+host+":9200/"+rankIndex+"/_search?sort=datetime:acs", HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
             return new JSONObject("{\"error\":\"No Index\"").toString();

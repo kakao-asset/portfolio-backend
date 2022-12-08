@@ -28,4 +28,8 @@ elasticsearch:
 logging:
   level:
     root: info
+index:
+  stock-rank-index: stock-rank
+  stock-list-index: stock-code-list
+  multi-stock-index: stock-data
 

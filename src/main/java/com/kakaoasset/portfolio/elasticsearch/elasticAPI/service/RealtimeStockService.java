@@ -19,8 +19,10 @@ public class RealtimeStockService {
     @Value("${elasticsearch.host}")
     private String host;
 
+    @Value("${index.multi-stock-index}")
+    private String multiIndex;
+
     public String selectRealtimeStock(String stock_name){
-        String index = "stock-data";
         JSONArray jsonarr = new JSONArray();
         String result = null;
 
@@ -35,7 +37,7 @@ public class RealtimeStockService {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-            result = restTemplate.exchange("http://"+host+":9200/"+index+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
+            result = restTemplate.exchange("http://"+host+":9200/"+multiIndex+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
             return new JSONObject("{\"error\":\"No Index\", \"index\":\""+stock_name+"\"}").toString();
