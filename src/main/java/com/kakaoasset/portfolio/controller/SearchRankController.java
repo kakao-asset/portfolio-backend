@@ -1,6 +1,6 @@
-package com.kakaoasset.portfolio.elasticsearch.elasticAPI.controller;
+package com.kakaoasset.portfolio.controller;
 
-import com.kakaoasset.portfolio.elasticsearch.elasticAPI.service.SearchRankService;
+import com.kakaoasset.portfolio.service.SearchRankService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;

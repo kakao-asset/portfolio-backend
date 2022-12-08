@@ -1,4 +1,4 @@
-package com.kakaoasset.portfolio.elasticsearch.elasticAPI.service;
+package com.kakaoasset.portfolio.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.json.JSONArray;
