@@ -1,5 +1,5 @@
-package com.kakaoasset.portfolio.elasticsearch.elasticAPI.controller;
-import com.kakaoasset.portfolio.elasticsearch.elasticAPI.service.RealtimeStockService;
+package com.kakaoasset.portfolio.controller;
+import com.kakaoasset.portfolio.service.RealtimeStockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
