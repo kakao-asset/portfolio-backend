@@ -14,16 +14,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -79,9 +77,36 @@ public class AuthService {
         return oauthToken;
     }
 
-    public LoginDto saveMemberAndGetJwtToken(String token) {
+    public Object saveMemberAndGetJwtToken(String token) {
 
         KakaoProfile profile = findProfile(token);
+
+        if(profile.getKakao_account().getEmail() == null){
+            System.out.println(profile.getId());
+            RestTemplate rt = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + token);
+            headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+            HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest =
+                    new HttpEntity<>(headers);
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("target_id_type", "user_id");
+            params.add("target_id", String.valueOf(profile.getId()));
+            ResponseEntity<String> unlinkResponse = rt.exchange(
+                    "https://kapi.kakao.com/v1/user/unlink",
+                    HttpMethod.POST,
+                    new HttpEntity<>(params, headers),
+                    String.class
+            );
+
+            return BasicResponse.builder()
+                    .code(HttpStatus.UNAUTHORIZED.value())
+                    .message("이메일을 넣어주세요")
+                    .data(Collections.emptyList())
+                    .build();
+        }
 
         Member member = memberRepository.findByEmail(profile.getKakao_account().getEmail());
 
