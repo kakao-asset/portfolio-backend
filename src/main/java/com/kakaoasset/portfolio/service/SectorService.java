@@ -132,7 +132,6 @@ public class SectorService {
 
             jsonarr.put(temp);
         }
-
         return jsonarr.toString();
     }
 
