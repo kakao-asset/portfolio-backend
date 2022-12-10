@@ -25,8 +25,10 @@ public class SectorService {
     @Value("${elasticsearch.host}")
     private String host;
 
+    @Value("${index.multi-stock-index}")
+    private String multiIndex;
+
     public String selectSectorStock(String stock_sector){
-        String index = "stock-data";
         JSONArray jsonarr = new JSONArray();
         String result = null;
         String personResultAsJsonStr = null;
@@ -107,7 +109,7 @@ public class SectorService {
                     new HttpEntity<String>(req_json.toString(), headers);
 
             personResultAsJsonStr =
-                    restTemplate.postForObject("http://"+host+":9200/"+index+"/_search", request, String.class);
+                    restTemplate.postForObject("http://"+host+":9200/"+multiIndex+"/_search", request, String.class);
 
         }catch (HttpClientErrorException e){
             // no index
@@ -129,8 +131,6 @@ public class SectorService {
             temp.put("id", ((JSONObject) ((JSONObject) json.getJSONObject("aggregations").getJSONObject("groupby").getJSONArray("buckets").get(i)).getJSONObject("cae43aee").getJSONObject("hits").getJSONArray("hits").get(0)).get("_id"));
 
             jsonarr.put(temp);
-
-
         }
         return jsonarr.toString();
     }

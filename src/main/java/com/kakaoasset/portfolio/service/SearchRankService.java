@@ -1,9 +1,9 @@
 package com.kakaoasset.portfolio.service;
 
 
-import org.springframework.beans.factory.annotation.Value;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,16 +13,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ *packageName    : com.kakaoasset.portfolio.elasticsearch.elasticAPI.service
+ * fileName       : SearchRankController
+ * author         : Hwang
+ * date           : 2022-11-14
+*/
+
 @Service
-public class RealtimeStockService {
+public class SearchRankService {
 
     @Value("${elasticsearch.host}")
     private String host;
 
-    @Value("${index.multi-stock-index}")
-    private String multiIndex;
+    @Value("${index.stock-rank-index}")
+    private String rankIndex;
 
-    public String selectRealtimeStock(String stock_name){
+
+    public String selectSearchRank(){
         JSONArray jsonarr = new JSONArray();
         String result = null;
 
@@ -37,10 +45,11 @@ public class RealtimeStockService {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-            result = restTemplate.exchange("http://"+host+":9200/"+multiIndex+"/_search?sort=datetime:acs&size=10000&q=" + stock_name, HttpMethod.GET, entity, String.class).getBody();
+
+            result = restTemplate.exchange("http://"+host+":9200/"+rankIndex+"/_search?sort=datetime:acs", HttpMethod.GET, entity, String.class).getBody();
         }catch (HttpClientErrorException e){
             // no index
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+stock_name+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\"").toString();
         }
 
         JSONObject json = new JSONObject(result);

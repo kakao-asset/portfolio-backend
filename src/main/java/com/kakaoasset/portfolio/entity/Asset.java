@@ -1,7 +1,5 @@
 package com.kakaoasset.portfolio.entity;
 
-import com.kakaoasset.portfolio.dto.CashDto;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,8 +24,11 @@ public class Asset {
         this.cash = cash;
     }
 
-    public Asset updateCash(int cash){
+    public void updateCash(int cash){
         this.cash = cash;
-        return this;
+    }
+
+    public void updateBuyPrice(int buyPrice){
+        this.buyPrice = buyPrice;
     }
 }

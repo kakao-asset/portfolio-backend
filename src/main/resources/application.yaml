@@ -1,0 +1,35 @@
+jwt:
+  password: ${JWT_PASSWRD}
+  issuer: ${JWT_ISSUER}
+kakao-oauth:
+  client-id: ${KAKAO-OAUTH_CLIENT_ID}
+  redirect-uri: ${KAKAO-OAUTH_REDIRECT-URI}
+  admin-key: ${KAKAO-OAUTH_ADMIN_KEY}
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: root
+    password: root
+  jpa:
+    open-in-view: false
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  cache:
+    type: redis
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+elasticsearch:
+  host: 52.78.120.51
+  port: 9200
+logging:
+  level:
+    root: info
+index:
+  stock-rank-index: stock-rank
+  stock-list-index: stock-code-list
+  multi-stock-index: stock-data
+

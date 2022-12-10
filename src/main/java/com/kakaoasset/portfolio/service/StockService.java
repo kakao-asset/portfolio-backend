@@ -36,6 +36,12 @@ public class StockService {
     @Value("${elasticsearch.host}")
     private String host;
 
+    @Value("${index.stock-rank-index}")
+    private String rankIndex;
+
+    @Value("${index.stock-list-index}")
+    private String listIndex;
+
     public StockResponseDto buyStock(Long id, StockRequestDto stockRequestDto){
         Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockRequestDto.getStockName(), id);
         if(stock == null){
@@ -48,10 +54,16 @@ public class StockService {
             stock.setQuantity(originQuantity + quantity);
             stock.setAvgPrice((originQuantity * originPrice + quantity * price)/ stock.getQuantity());
         }
-        stockRepository.save(stock);
 
         StockHistory stockHistory = stockRequestDto.toStockHistoryEntity(memberRepository.findByMemberId(id), true);
+
+        Optional<Asset> asset = assetRepository.findByMemberId(id);
+        asset.get().updateCash(asset.get().getCash() - (stockRequestDto.getPrice() * stockRequestDto.getQuantity()));
+        asset.get().updateBuyPrice(asset.get().getBuyPrice() + (stockRequestDto.getPrice() * stockRequestDto.getQuantity()));
+
+        stockRepository.save(stock);
         stockHistoryRepository.save(stockHistory);
+        assetRepository.save(asset.get());
 
         return StockResponseDto.builder()
                 .stockName(stock.getStockName())
@@ -70,7 +82,13 @@ public class StockService {
         int quantity = stock.getQuantity() - stockRequestDto.getQuantity();
 
         StockHistory stockHistory = stockRequestDto.toStockHistoryEntity(memberRepository.findByMemberId(id), false);
+
+        Optional<Asset> asset = assetRepository.findByMemberId(id);
+        asset.get().updateCash(asset.get().getCash() + (stockRequestDto.getPrice() * stockRequestDto.getQuantity()));
+        asset.get().updateBuyPrice(asset.get().getBuyPrice() - (stock.getAvgPrice() * stock.getQuantity()));
+
         stockHistoryRepository.save(stockHistory);
+        assetRepository.save(asset.get());
 
         // 전량 매도
         if (quantity == 0) {
@@ -103,7 +121,6 @@ public class StockService {
     }
 
     public Object getStockList(){
-        String index = "stock-code-list";
         String result;
         // make request for elasticsearch api
         RestTemplate rt = new RestTemplate();
@@ -116,13 +133,13 @@ public class StockService {
         final HttpEntity<?> entity = new HttpEntity<>(headers);
         try {
             // send request to elasticsearch
-            String uri = "http://"+ host + ":9200/"+index+"/_search?size=2000";
+            String uri = "http://"+ host + ":9200/"+listIndex+"/_search?size=2000";
             result = rt.exchange(uri, HttpMethod.GET, entity, String.class).getBody();
 
         }catch (HttpClientErrorException e){
             // no index
             System.out.println(e);
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+index+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+listIndex+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
@@ -144,7 +161,6 @@ public class StockService {
     }
 
     public Object getMatchStockList(String word){
-        String index = "stock-code-list";
         String result;
         // make request for elasticsearch api
         RestTemplate rt = new RestTemplate();
@@ -157,7 +173,7 @@ public class StockService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String url = "http://"+host+":9200/"+index+"/_search?size=15";
+        String url = "http://"+host+":9200/"+listIndex+"/_search?size=15";
         String query = "{\n" +
                 "    \"query\" :{\n" +
                 "        \"prefix\": {\n" +
@@ -172,7 +188,7 @@ public class StockService {
         }catch (HttpClientErrorException e){
             // no index
             System.out.println(e);
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+index+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+listIndex+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
@@ -192,7 +208,6 @@ public class StockService {
     }
 
     public Object getDaumRank(){
-        String index = "stock-rank";
         String result;
         // make request for elasticsearch api
         RestTemplate rt = new RestTemplate();
@@ -203,7 +218,7 @@ public class StockService {
 
         try {
             // send request to elasticsearch
-            String uri = "http://"+host+":9200/"+index+"/_search?";
+            String uri = "http://"+host+":9200/"+rankIndex+"/_search?";
             result = rt.exchange(uri,
                     HttpMethod.GET,
                     entity,
@@ -212,7 +227,7 @@ public class StockService {
         }catch (HttpClientErrorException e){
             // no index
             System.out.println(e);
-            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+index+"\"}").toString();
+            return new JSONObject("{\"error\":\"No Index\", \"index\":\""+rankIndex+"\"}").toString();
         }
 
         JSONObject json = new JSONObject(result);
@@ -236,11 +251,12 @@ public class StockService {
 
     }
 
-    public List<HistoryListDto> getStockHistory(Long id){
+    public List<HistoryResponseDto> getStockHistory(Long id){
 
         // history만 주는 중
         List<StockHistory> stockHistoryList = stockHistoryRepository.findByMember_MemberId(id);
-        MultiValueMap<String, HistoryResponseDto> historyMap = new LinkedMultiValueMap<>();
+
+        List<HistoryResponseDto> historyList = new ArrayList<>();
 
         JSONObject json = new JSONObject();
         for(StockHistory sh: stockHistoryList) {
@@ -249,14 +265,10 @@ public class StockService {
                     .price(sh.getPrice())
                     .quantity(sh.getQuantity())
                     .tradeType(sh.isTradeType())
+                    .tradeDate(String.valueOf(sh.getTradeDate()))
                     .tradeTime(sh.getTradeTime())
                     .build();
-            historyMap.add(sh.getTradeDate().toString(), data);
-        }
-        List<HistoryListDto> historyList = new ArrayList<>();
-
-        for(String date: historyMap.keySet()){
-            historyList.add(new HistoryListDto(date, historyMap.get(date)));
+            historyList.add(data);
         }
 
         return historyList;
@@ -286,11 +298,11 @@ public class StockService {
         return trendDtoList;
     }
 
-    public CashDto getCash(Long id){
-        return new CashDto(assetRepository.findByMemberId(id).get().getCash());
+    public Object getCash(Long id){
+        return assetRepository.findByMemberId(id).isPresent() ? new CashDto(assetRepository.findByMemberId(id).get().getCash()) : Collections.emptyList();
     }
 
-    public String updateCash(Long id, CashDto cashDto){
+    public List<Object> updateCash(Long id, CashDto cashDto){
         Asset asset = assetRepository.findByMemberId(id).orElse(null);
         if(asset == null) {
             asset = Asset.builder()
@@ -303,6 +315,6 @@ public class StockService {
 
         assetRepository.save(asset);
 
-        return "d";
+        return Collections.emptyList();
     }
 }
