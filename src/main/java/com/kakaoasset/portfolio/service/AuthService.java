@@ -81,34 +81,7 @@ public class AuthService {
 
         KakaoProfile profile = findProfile(token);
 
-        if(profile.getKakao_account().getEmail() == null){
-            System.out.println(profile.getId());
-            RestTemplate rt = new RestTemplate();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + token);
-            headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
-            HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest =
-                    new HttpEntity<>(headers);
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("target_id_type", "user_id");
-            params.add("target_id", String.valueOf(profile.getId()));
-            ResponseEntity<String> unlinkResponse = rt.exchange(
-                    "https://kapi.kakao.com/v1/user/unlink",
-                    HttpMethod.POST,
-                    new HttpEntity<>(params, headers),
-                    String.class
-            );
-
-            return BasicResponse.builder()
-                    .code(HttpStatus.UNAUTHORIZED.value())
-                    .message("이메일을 넣어주세요")
-                    .data(Collections.emptyList())
-                    .build();
-        }
-
-        Member member = memberRepository.findByEmail(profile.getKakao_account().getEmail());
+        Member member = memberRepository.findByKakaoId(String.valueOf(profile.getId()));
 
         if(member == null) {
             member = Member.builder()
