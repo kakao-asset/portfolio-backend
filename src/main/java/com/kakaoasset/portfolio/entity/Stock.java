@@ -34,10 +34,10 @@ public class Stock {
     @Column(name = "sector_name")
     private String sectorName;
 
-    private int quantity;
+    private Long quantity;
 
     @Column(name = "avg_price")
-    private int avgPrice;
+    private Long avgPrice;
 
     public StockResponseDto toDto(){
         return StockResponseDto.builder()

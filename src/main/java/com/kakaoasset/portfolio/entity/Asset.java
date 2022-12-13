@@ -3,6 +3,7 @@ package com.kakaoasset.portfolio.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -14,21 +15,23 @@ public class Asset {
     @Id
     private Long memberId;
 
-    private int cash;
+    private Long cash;
 
-    private int buyPrice;
+    @ColumnDefault("0") //default 0
+    private Long buyPrice;
 
     @Builder
-    public Asset(Long id, int cash){
+    public Asset(Long id, Long cash, Long buyPrice){
         this.memberId= id;
+        this.buyPrice = buyPrice;
         this.cash = cash;
     }
 
-    public void updateCash(int cash){
+    public void updateCash(Long cash){
         this.cash = cash;
     }
 
-    public void updateBuyPrice(int buyPrice){
+    public void updateBuyPrice(Long buyPrice){
         this.buyPrice = buyPrice;
     }
 }

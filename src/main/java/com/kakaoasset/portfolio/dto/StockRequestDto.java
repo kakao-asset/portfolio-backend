@@ -15,8 +15,8 @@ import java.time.format.DateTimeFormatter;
 
 @Getter
 public class StockRequestDto {
-    private int price;
-    private int quantity;
+    private Long price;
+    private Long quantity;
     private String stockName;
     private String stockCode;
     private String sectorCode;

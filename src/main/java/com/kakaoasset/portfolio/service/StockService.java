@@ -47,10 +47,10 @@ public class StockService {
         if(stock == null){
             stock = stockRequestDto.toStockEntity(memberRepository.findByMemberId(id));
         } else {
-            int originQuantity = stock.getQuantity();
-            int originPrice = stock.getAvgPrice();
-            int quantity = stockRequestDto.getQuantity();
-            int price = stockRequestDto.getPrice();
+            Long originQuantity = stock.getQuantity();
+            Long originPrice = stock.getAvgPrice();
+            Long quantity = stockRequestDto.getQuantity();
+            Long price = stockRequestDto.getPrice();
             stock.setQuantity(originQuantity + quantity);
             stock.setAvgPrice((originQuantity * originPrice + quantity * price)/ stock.getQuantity());
         }
@@ -58,6 +58,7 @@ public class StockService {
         StockHistory stockHistory = stockRequestDto.toStockHistoryEntity(memberRepository.findByMemberId(id), true);
 
         Optional<Asset> asset = assetRepository.findByMemberId(id);
+
         asset.get().updateCash(asset.get().getCash() - (stockRequestDto.getPrice() * stockRequestDto.getQuantity()));
         asset.get().updateBuyPrice(asset.get().getBuyPrice() + (stockRequestDto.getPrice() * stockRequestDto.getQuantity()));
 
@@ -79,7 +80,7 @@ public class StockService {
     public Object sellStock(Long id, StockRequestDto stockRequestDto){
         Stock stock = stockRepository.findByStockNameAndMember_MemberId(stockRequestDto.getStockName(), id);
 
-        int quantity = stock.getQuantity() - stockRequestDto.getQuantity();
+        Long quantity = stock.getQuantity() - stockRequestDto.getQuantity();
 
         StockHistory stockHistory = stockRequestDto.toStockHistoryEntity(memberRepository.findByMemberId(id), false);
 
@@ -308,6 +309,7 @@ public class StockService {
             asset = Asset.builder()
                     .id(id)
                     .cash(cashDto.getCash())
+                    .buyPrice(0L)
                     .build();
         } else {
             asset.updateCash(asset.getCash() + cashDto.getCash());

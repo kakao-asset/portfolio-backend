@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor //  cannot deserialize from Object value (no delegate- or property-based Creator)
 public class CashDto {
-    int cash;
+    Long cash;
 
-    public CashDto(int cash) {
+    public CashDto(Long cash) {
         this.cash = cash;
     }
 }

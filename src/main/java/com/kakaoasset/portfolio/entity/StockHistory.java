@@ -31,9 +31,9 @@ public class StockHistory {
     @Column(columnDefinition = "TINYINT(1)")
     private boolean tradeType;
 
-    private int price;
+    private Long price;
 
-    private int quantity;
+    private Long quantity;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date tradeDate;
