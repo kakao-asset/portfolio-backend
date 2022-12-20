@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public class MemberDto {
 
-    private String userId;
+    private String memberId;
     private String nickname;
     private String profile;
-    private String Email;
+    private String email;
 }

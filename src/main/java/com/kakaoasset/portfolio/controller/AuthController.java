@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,13 +24,10 @@ public class AuthController {
         // 프론트 넘어온 인가 코드를 통해 kakao access token 발급
         OauthToken oauthToken = authService.getKakaoAccessToken(code);
 
-        // kakao access token으로 DB에 멤버 저장 및 JWT Token 발급
-        LoginDto loginDto = authService.saveMemberAndGetJwtToken(oauthToken.getAccess_token());
-
         BasicResponse response = BasicResponse.builder()
                 .code(HttpStatus.OK.value())
                 .message("로그인에 성공했습니다.")
-                .data(loginDto)
+                .data(authService.saveMemberAndGetJwtToken(oauthToken.getAccess_token()))
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -47,7 +46,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout/{userId}")
-    public ResponseEntity<BasicResponse> logout(@PathVariable("userId") String userId){
+    public ResponseEntity<BasicResponse> logout(@PathVariable("userId") Long userId){
         // 카카오에 연결 끊기 요청 및 레디스에서 리프레시 토큰 삭제
         authService.logout(userId);
 
@@ -60,27 +59,18 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/bridge")
-    public ResponseEntity<BasicResponse> moveMain(@RequestHeader String token){
-        if(authService.isValidToken(token)){
-            BasicResponse response = BasicResponse.builder()
-                    .code(HttpStatus.OK.value())
-                    .message("유효한 토큰입니다.")
-                    .data(Collections.emptyList())
-                    .build();
+    @DeleteMapping("/unlink/{userId}")
+    public ResponseEntity<BasicResponse> unlink(@PathVariable("userId") Long userId){
+        // 카카오에 연결 끊기 요청 및 레디스에서 리프레시 토큰 삭제
+        authService.unlink(userId);
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            BasicResponse response = BasicResponse.builder()
-                    .code(HttpStatus.UNAUTHORIZED.value())
-                    .message("유효하지 않은 토큰입니다.")
-                    .data(Collections.emptyList())
-                    .build();
+        BasicResponse response = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("회원탈퇴에 성공했습니다.")
+                .data(Collections.emptyList())
+                .build();
 
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
-
-
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
 

@@ -14,15 +14,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -39,6 +38,9 @@ public class AuthService {
 
     @Value("${kakao-oauth.redirect-uri}")
     private String redirectUri;
+
+    @Value("${kakao-oauth.admin-key}")
+    private String adminKey;
 
     public OauthToken getKakaoAccessToken(String code) {
 
@@ -75,11 +77,11 @@ public class AuthService {
         return oauthToken;
     }
 
-    public LoginDto saveMemberAndGetJwtToken(String token) {
+    public Object saveMemberAndGetJwtToken(String token) {
 
         KakaoProfile profile = findProfile(token);
 
-        Member member = memberRepository.findByEmail(profile.getKakao_account().getEmail());
+        Member member = memberRepository.findByKakaoId(String.valueOf(profile.getId()));
 
         if(member == null) {
             member = Member.builder()
@@ -87,25 +89,26 @@ public class AuthService {
                     .profile(profile.getKakao_account().getProfile().getProfile_image_url())
                     .nickname(profile.getKakao_account().getProfile().getNickname())
                     .email(profile.getKakao_account().getEmail())
+                    .role("ROLE_USER")
                     .build();
 
             memberRepository.save(member);
         }
 
         MemberDto memberDto = MemberDto.builder()
-                .userId(member.getKakaoId())
-                .Email(member.getEmail())
+                .memberId(String.valueOf(member.getMemberId()))
+                .email(member.getEmail())
                 .nickname(member.getNickname())
                 .profile(member.getProfile())
                 .build();
 
         TokenDto tokenDto = TokenDto.builder()
-                        .accessToken(jwtProvider.createAccessToken(memberDto.getUserId()))
+                        .accessToken(jwtProvider.createAccessToken(memberDto.getMemberId()))
                         .refreshToken(jwtProvider.createRefreshToken())
                         .build();
 
         LoginDto loginDto = LoginDto.builder()
-                .userId(memberDto.getUserId())
+                .userId(memberDto.getMemberId())
                 .nickname(memberDto.getNickname())
                 .profile(memberDto.getProfile())
                 .accessToken(tokenDto.getAccessToken())
@@ -113,7 +116,7 @@ public class AuthService {
                 .build();
 
         // redis에 refreshToken 저장
-        redisTemplate.opsForValue().set(memberDto.getUserId(), tokenDto.getRefreshToken(), jwtProvider.getExpirationTime(tokenDto.getRefreshToken()), TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(memberDto.getMemberId(), tokenDto.getRefreshToken(), jwtProvider.getExpirationTime(tokenDto.getRefreshToken()), TimeUnit.MILLISECONDS);
 
         return loginDto;
     }
@@ -159,34 +162,64 @@ public class AuthService {
 
     }
 
-    public void logout(String id){
+    public void logout(Long id){
 
-        // 1. 카카오에 unlink 요청하기
+        // 1. 카카오에 logout 요청하기
         RestTemplate rt = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-        headers.add("Authorization", "KakaoAk " + "81fa08c2d9abab66a331d2f5295a825a");
+        headers.add("Authorization", "KakaoAK " + adminKey);
 
+        String kakaoId = memberRepository.findByMemberId(id).getKakaoId();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("target_id_type", "user_id");
-        params.add("target_id", id);
-        ResponseEntity<String> unlinkResponse = rt.exchange(
-                "https://kapi.kakao.com/v1/user/unlink",
+        params.add("target_id", String.valueOf(kakaoId));
+        ResponseEntity<String> logoutResponse = rt.exchange(
+                "https://kapi.kakao.com/v1/user/logout",
                 HttpMethod.POST,
-                new HttpEntity<>(headers, params),
+                new HttpEntity<>(params, headers),
                 String.class
         );
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            System.out.println(objectMapper.readValue(unlinkResponse.getBody(), OauthToken.class));
+            System.out.println(objectMapper.readValue(logoutResponse.getBody(), LogoutResponse.class));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
         // 2. redis에서 리프레쉬 토큰 삭제
-        redisTemplate.delete(id);
+        redisTemplate.delete(String.valueOf(id));
+    }
+
+    @Transactional
+    public void unlink(Long id){
+        RestTemplate rt = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        headers.add("Authorization", "KakaoAK " + adminKey);
+
+        String kakaoId = memberRepository.findByMemberId(id).getKakaoId();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("target_id_type", "user_id");
+        params.add("target_id", String.valueOf(kakaoId));
+        ResponseEntity<String> unlinkResponse = rt.exchange(
+                "https://kapi.kakao.com/v1/user/unlink",
+                HttpMethod.POST,
+                new HttpEntity<>(params, headers),
+                String.class
+        );
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            System.out.println(objectMapper.readValue(unlinkResponse.getBody(), LogoutResponse.class));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        memberRepository.deleteByMemberId(id);
+        redisTemplate.delete(String.valueOf(id));
     }
 
     public boolean isValidToken(String token){
